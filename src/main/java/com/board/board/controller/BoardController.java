@@ -19,17 +19,21 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
+    @GetMapping("board/login")
+    public String getLoginPage(Model model)
+    {
+        return "login";
+    }
+
     @GetMapping("/board/write") //localhost:8090/board/write
     public String boardWriteForm() {
-
         return "boardwrite";
     }
 
     @PostMapping("/board/writepro")
     public String boardWritePro(Board board, MultipartFile file) throws Exception{
-
         boardService.write(board, file);
-        return "";
+        return "message";
     }
 
     @GetMapping("/board/list")
@@ -38,28 +42,25 @@ public class BoardController {
                             String searchKeyword) {
 
         Page<Board> list = null;
-
         if(searchKeyword == null) {
             list = boardService.boardList(pageable);
-        }else {
+        }
+        else {
             list = boardService.boardSearchList(searchKeyword, pageable);
         }
 
         int nowPage = list.getPageable().getPageNumber() + 1;
         int startPage = Math.max(nowPage - 4, 1);
         int endPage = Math.min(nowPage + 5, list.getTotalPages());
-
         model.addAttribute("list", list);
         model.addAttribute("nowPage", nowPage);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-
         return "boardlist";
     }
 
     @GetMapping("/board/view") // localhost:8080/board/view?id=1
     public String boardView(Model model, Integer id) {
-
         model.addAttribute("board", boardService.boardView(id));
         return "boardview";
     }
